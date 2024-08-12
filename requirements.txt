@@ -1,0 +1,13 @@
+keybert
+torch 
+torchvision 
+torchaudio
+rake-nltk
+yake
+wordcloud
+matplotlib
+keybert 
+transformers 
+pandas 
+openpyxl
+
