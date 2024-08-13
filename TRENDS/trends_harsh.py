@@ -25,7 +25,7 @@ def determine_trend(keyword):
     return "stable"  # Default to stable if no match
 
 # Read the content from the text file
-with open('../Content.txt', 'r', encoding='utf-8') as file:
+with open('Trend.txt', 'r', encoding='utf-8') as file:
     text = file.read()
 
 # Extract keywords using RAKE

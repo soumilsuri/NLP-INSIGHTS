@@ -1,49 +1,54 @@
 import os
-import re
+import spacy
 import pandas as pd
 
-# List of text files to process
-file_names = [
-    'Content1.txt',
-    'Content2.txt',
-    'Content3.txt',
-    'Content4.txt',
-    'Content5.txt',
-]
+# Load the spaCy model
+nlp = spacy.load('en_core_web_sm')
 
-# Directory containing text files (current working directory)
+# Path to the Trends.txt file
+file_name = 'Trend.txt'
+
+# Directory containing the text file (current working directory)
 directory = os.getcwd()
 
 # Keywords related to trends
-trend_keywords = ['trend', 'increase', 'decrease', 'growth', 'decline', 'upward', 'downward', 'fall', 'rise']
+trend_keywords = [
+    'trend', 'increase', 'decrease', 'growth', 'decline',
+    'upward', 'downward', 'fall', 'rise', 'surge', 'drop',
+    'escalation', 'reduction', 'spike', 'plunge', 'gain',
+    'loss', 'progress', 'regression', 'expansion', 'contraction',
+    'improvement', 'deterioration', 'advance', 'retreat',
+    'upturn', 'downturn', 'boost', 'slump', 'peak', 'trough'
+]
 
-# Function to analyze trends based on keywords
+# Function to analyze trends based on keywords using spaCy
 def analyze_trends(text):
     found_keywords = {}
+    doc = nlp(text)
     for keyword in trend_keywords:
-        # Search for keyword and context (a few words before and after)
-        pattern = rf'\b(?:\w+\W+){0,3}{keyword}(?:\W+\w+){0,3}\b'
-        matches = re.findall(pattern, text, re.IGNORECASE)
+        matches = []
+        for sent in doc.sents:
+            if keyword in sent.text.lower():
+                matches.append(sent.text)
         if matches:
             found_keywords[keyword] = matches
     return found_keywords
 
-# Process each file to analyze trends
+# Process the file to analyze trends
 trends_data = []
-for file_name in file_names:
-    file_path = os.path.join(directory, file_name)
-    if os.path.exists(file_path):
-        with open(file_path, 'r', encoding='utf-8') as file:
-            text = file.read()
-        trends = analyze_trends(text)
-        if trends:
-            for keyword, contexts in trends.items():
-                for context in contexts:
-                    trends_data.append({'File': file_name, 'Keyword': keyword, 'Context': context})
-        else:
-            trends_data.append({'File': file_name, 'Keyword': 'None', 'Context': 'No trend-related keywords found'})
+file_path = os.path.join(directory, file_name)
+if os.path.exists(file_path):
+    with open(file_path, 'r', encoding='utf-8') as file:
+        text = file.read()
+    trends = analyze_trends(text)
+    if trends:
+        for keyword, contexts in trends.items():
+            for context in contexts:
+                trends_data.append({'File': file_name, 'Keyword': keyword, 'Context': context})
     else:
-        print(f"File not found: {file_path}")
+        trends_data.append({'File': file_name, 'Keyword': 'None', 'Context': 'No trend-related keywords found'})
+else:
+    print(f"File not found: {file_path}")
 
 # Convert the results to a DataFrame
 df_trends = pd.DataFrame(trends_data)
